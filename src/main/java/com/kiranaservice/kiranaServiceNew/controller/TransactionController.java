@@ -24,22 +24,27 @@ public class TransactionController {
     @Autowired
     TransactionService transactionService;
 
+    // This API performs the task of recording a transaction in DB, by taking a transaction as Request Body.
     @PostMapping("/transaction")
     public ResponseEntity<?> addTransaction(@RequestBody Transaction transaction) {
         log.info("Transaction received {}", transaction);
         Transaction save = transactionService.recordTransaction(transaction);
-        //Transaction save = this.transactionRepository.save(transaction);
         return ResponseEntity.ok(save);
     }
 
+    // This API performs the task of displaying all transactions that occured.
     @GetMapping(value = "/transactions")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public List<Transaction> getAllTransactions() {
+        log.info("All Transactions request received");
         return transactionService.getAllTransactions();
     }
 
+    // This API performs the task of displaying transaction by filtering them datewise, on the attribute timestamp
     @GetMapping("/transactions/daily")
     public ResponseEntity<Map<LocalDate, List<Transaction>>> getDailyTransactions() {
+        log.info("Daily Transaction request received ");
+
         Map<LocalDate, List<Transaction>> transactions = transactionService.getTransactionsGroupedByDate();
         return ResponseEntity.ok(transactions);
     }

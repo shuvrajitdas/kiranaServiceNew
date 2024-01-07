@@ -11,6 +11,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Transaction {
+    /** This is the schema on real life based transaction occuring in Kirana stores helping the use case to store in DB
+     * transactionId is something which is unique for every transaction (front end should make it unique).
+     * transactionType - CREDIT/DEBIT
+     * timestamp - at which the transaction occured
+     */
+
     @Id
     private String transactionId;
     private Double originalAmount;

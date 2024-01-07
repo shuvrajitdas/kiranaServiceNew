@@ -22,6 +22,11 @@ public class TransactionService {
     @Autowired
     CurrencyConversionService currencyConversionService;
 
+    /**
+     * This method takes the responsibility of recording transaction in DB.
+     * If the originalCurrency is not INR, it creates another convertedAmountInINR for the use of store manager
+     * Then saves it
+     */
     @Transactional
     public Transaction recordTransaction(Transaction transaction) {
         log.info("Transaction received {}", transaction);
@@ -34,11 +39,20 @@ public class TransactionService {
         return this.transactionRepository.save(transaction);
     }
 
+    /**
+     * Returns all transactions
+     */
     public List<Transaction> getAllTransactions() {
+        log.info("All transactions");
         return this.transactionRepository.findAll();
     }
 
+
+    /**
+     * Returns all the transactions grouping them by date
+     */
     public Map<LocalDate, List<Transaction>> getTransactionsGroupedByDate() {
+        log.info("Successfull returned all transactions");
         List<Transaction> transactions = this.transactionRepository.findAll();
         return transactions.stream()
                 .collect(Collectors.groupingBy(transaction -> transaction.getTimestamp().toLocalDate()));

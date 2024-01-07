@@ -35,6 +35,7 @@ public class TransactionServiceTests {
     @Test
     @DisplayName("Group transactions by date")
     void shouldGroupTransactionsByDate() {
+        // Create three transactions with the current timestamp
         Transaction transaction1 = new Transaction();
         transaction1.setTimestamp(LocalDateTime.now());
         Transaction transaction2 = new Transaction();
@@ -42,20 +43,26 @@ public class TransactionServiceTests {
         Transaction transaction3 = new Transaction();
         transaction3.setTimestamp(LocalDateTime.now());
 
+        // Mock the findAll method of transactionRepository to return the three transactions
         when(transactionRepository.findAll()).thenReturn(Arrays.asList(transaction1, transaction2, transaction3));
 
+        // Call the method to test
         Map<LocalDate, List<Transaction>> transactions = transactionService.getTransactionsGroupedByDate();
 
+        // Assert that the transactions are grouped correctly by date
         assertEquals(3, transactions.get(LocalDateTime.now().toLocalDate()).size());
     }
 
     @Test
     @DisplayName("Handle no transactions")
     void shouldHandleNoTransactions() {
+        // Mock the findAll method of transactionRepository to return an empty list
         when(transactionRepository.findAll()).thenReturn(Arrays.asList());
 
+        // Call the method to test
         Map<LocalDate, List<Transaction>> transactions = transactionService.getTransactionsGroupedByDate();
 
+        // Assert that the result is an empty map
         assertEquals(0, transactions.size());
     }
 }
