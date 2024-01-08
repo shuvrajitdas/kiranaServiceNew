@@ -30,30 +30,40 @@ public class TransactionService {
      */
     @Transactional
     public Transaction recordTransaction(Transaction transaction) {
-        log.info("Transaction received {}", transaction);
-        if (!transaction.getOriginalCurrency().equals("INR")) {
-            log.info("Converting currency to INR");
-            double amountInInr = currencyConversionService.convertToInr(transaction.getOriginalAmount(), transaction.getOriginalCurrency());
-            log.info("Converted amount in INR {}", amountInInr);
-            transaction.setConvertedAmountInINR(amountInInr);
+        try {
+            log.info("Transaction received {}", transaction);
+            if (!transaction.getOriginalCurrency().equals("INR")) {
+                log.info("Converting currency to INR");
+                double amountInInr = currencyConversionService.convertToInr(transaction.getOriginalAmount(), transaction.getOriginalCurrency());
+                log.info("Converted amount in INR {}", amountInInr);
+                transaction.setConvertedAmountInINR(amountInInr);
+            }
+            // Generate a unique transactionId
+            String uniqueID = UUID.randomUUID().toString();
+            transaction.setTransactionId(uniqueID);
+            return this.transactionRepository.save(transaction);
+        } catch (Exception e) {
+            log.error("Error occured while recording transaction", e);
+            return null;
         }
-        // Generate a unique transactionId
-        String uniqueID = UUID.randomUUID().toString();
-        transaction.setTransactionId(uniqueID);
-        return this.transactionRepository.save(transaction);
     }
 
     /**
      * Returns all transactions
      */
     public List<Transaction> getAllTransactions(String kiranaStoreId) {
-        List<Transaction> transactions = transactionRepository.findByKiranaStoreId(kiranaStoreId);
+        try {
+            List<Transaction> transactions = transactionRepository.findByKiranaStoreId(kiranaStoreId);
 
-        transactions = transactions.stream()
+            transactions = transactions.stream()
                     .filter(transaction -> kiranaStoreId.equals(transaction.getKiranaStoreId()))
                     .collect(Collectors.toList());
 
-        return transactions;
+            return transactions;
+        } catch (Exception e) {
+            log.error("Error occured while getting all transactions", e);
+            return null;
+        }
     }
 
 
@@ -62,8 +72,13 @@ public class TransactionService {
      */
 
     public Map<LocalDate, List<Transaction>> getTransactionsGroupedByDate(String kiranaStoreId) {
-        List<Transaction> transactions = this.transactionRepository.findByKiranaStoreId(kiranaStoreId);
-        return transactions.stream()
-                .collect(Collectors.groupingBy(transaction -> transaction.getTimestamp().toLocalDate()));
+        try {
+            List<Transaction> transactions = this.transactionRepository.findByKiranaStoreId(kiranaStoreId);
+            return transactions.stream()
+                    .collect(Collectors.groupingBy(transaction -> transaction.getTimestamp().toLocalDate()));
+        } catch (Exception e) {
+            log.error("Error occured while grouping transaction by date", e);
+            return null;
+        }
     }
 }

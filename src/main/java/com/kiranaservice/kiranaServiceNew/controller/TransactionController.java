@@ -53,11 +53,16 @@ public class TransactionController {
     //This api to see a particular transaction by transactionId
     @GetMapping("/transaction/{transactionId}")
     public ResponseEntity<Transaction> getTransactionById(@PathVariable String transactionId) {
-        Optional<Transaction> transaction = transactionRepository.findById(transactionId);
-        if (transaction.isPresent()) {
-            return ResponseEntity.ok(transaction.get());
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<Transaction> transaction = transactionRepository.findById(transactionId);
+            if (transaction.isPresent()) {
+                return ResponseEntity.ok(transaction.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while getting transaction by id", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
